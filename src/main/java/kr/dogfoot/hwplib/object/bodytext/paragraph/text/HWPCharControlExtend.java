@@ -1,5 +1,9 @@
 package kr.dogfoot.hwplib.object.bodytext.paragraph.text;
 
+
+import kr.dogfoot.hwplib.object.bodytext.control.ControlType;
+import kr.dogfoot.hwplib.object.bodytext.control.ctrlheader.CtrlID;
+
 /**
  * 확장 컨트롤 Character
  *
@@ -118,6 +122,18 @@ public class HWPCharControlExtend extends HWPChar {
         return false;
     }
 
+    public boolean isEquation() {
+        if (getCode() == 0x000b
+                && addition != null
+                && addition[3] == 'e'
+                && addition[2] == 'q'
+                && addition[1] == 'e'
+                && addition[0] == 'd') {
+            return true;
+        }
+        return false;
+    }
+
     public boolean isHyperlinkStart() {
         if (getCode() == 0x0003
                 && addition != null
@@ -141,6 +157,15 @@ public class HWPCharControlExtend extends HWPChar {
         return false;
     }
 
+    public boolean isFieldStart() {
+        if (getCode() == 0x0003
+                && addition != null) {
+            long ctrlID = CtrlID.make((char) addition[3], (char) addition[2], (char) addition[1], (char) addition[0]);
+            return ControlType.isField(ctrlID);
+        }
+        return false;
+    }
+
     public HWPChar clone() {
         HWPCharControlExtend cloned = new HWPCharControlExtend();
         cloned.code = code;
@@ -152,5 +177,10 @@ public class HWPCharControlExtend extends HWPChar {
         }
 
         return cloned;
+    }
+
+    @Override
+    public int getCharSize() {
+        return 8;
     }
 }

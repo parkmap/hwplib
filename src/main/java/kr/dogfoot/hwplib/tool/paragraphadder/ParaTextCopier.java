@@ -9,7 +9,8 @@ import kr.dogfoot.hwplib.object.bodytext.paragraph.text.*;
  * @author neolord
  */
 public class ParaTextCopier {
-    public static void copy(ParaText source, ParaText target) throws Exception {
+    public static int copy(ParaText source, ParaText target) throws Exception {
+        int notCopiedCharacterSize = 0;
         for (HWPChar hwpChar : source.getCharList()) {
             switch (hwpChar.getType()) {
                 case Normal:
@@ -23,14 +24,19 @@ public class ParaTextCopier {
                     break;
                 case ControlExtend:
                     if (((HWPCharControlExtend) hwpChar).isTable() ||
-                            ((HWPCharControlExtend) hwpChar).isGSO()) {
+                            ((HWPCharControlExtend) hwpChar).isGSO() ||
+                            ((HWPCharControlExtend) hwpChar).isEquation() ||
+                            ((HWPCharControlExtend) hwpChar).isFieldStart()) {
                         copyExtendChar((HWPCharControlExtend) hwpChar, target.addNewExtendControlChar());
+                    } else {
+                        notCopiedCharacterSize += 8;
                     }
                     break;
                 default:
                     break;
             }
         }
+        return notCopiedCharacterSize;
     }
 
     private static void copyNormalChar(HWPCharNormal source, HWPCharNormal target) {

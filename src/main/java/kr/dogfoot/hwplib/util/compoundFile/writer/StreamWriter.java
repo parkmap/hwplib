@@ -1,5 +1,6 @@
 package kr.dogfoot.hwplib.util.compoundFile.writer;
 
+import kr.dogfoot.hwplib.object.etc.HWPString;
 import kr.dogfoot.hwplib.object.fileheader.FileVersion;
 import kr.dogfoot.hwplib.util.binary.BitFlag;
 
@@ -256,12 +257,16 @@ public class StreamWriter {
      * @param size  레코드의 크기
      * @throws IOException
      */
-    public void writeRecordHeader(int tagID, int size) throws IOException {
+    public void writeRecordHeader(int tagID, long size) throws IOException {
         long header = 0;
         header = BitFlag.set(header, 0, 9, tagID);
         header = BitFlag.set(header, 10, 19, currentRecordLevel);
-        header = BitFlag.set(header, 20, 31, Math.min(size, 4095));
+        header = BitFlag.set(header, 20, 31, Math.min((int) size, 4095));
         writeUInt4(header);
+
+        if (size >= 4095) {
+            writeUInt4(size);
+        }
     }
 
     /**
@@ -281,12 +286,24 @@ public class StreamWriter {
         }
     }
 
+    public void writeHWPString(HWPString value) throws IOException {
+        if (value == null || value.getBytes() == null) {
+            writeUInt2(0);
+        } else {
+            writeUInt2(value.getBytes().length  / 2);
+            if (value.getBytes().length > 0) {
+                writeBytes(value.getBytes());
+            }
+        }
+    }
+
     /**
      * 한 문자(UTF-16LE)을 스트림(파일)에 저장한다.
      *
      * @param value 한 문자
      * @throws IOException
      */
+    /*
     public void writeWChar(String value) throws IOException {
         if (value != null && value.length() > 0) {
             byte[] buffer = value.getBytes(StandardCharsets.UTF_16LE);
@@ -295,6 +312,16 @@ public class StreamWriter {
             } else {
                 writeZero(2);
             }
+        } else {
+            writeZero(2);
+        }
+    }
+
+     */
+
+    public void writeWChar(byte[] value) throws IOException {
+        if (value != null && value.length >= 2) {
+            os.write(value, 0, 2);
         } else {
             writeZero(2);
         }
@@ -326,4 +353,5 @@ public class StreamWriter {
     public void downRecordLevel() {
         currentRecordLevel--;
     }
+
 }

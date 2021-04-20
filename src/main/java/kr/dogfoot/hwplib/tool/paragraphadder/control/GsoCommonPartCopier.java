@@ -22,7 +22,10 @@ import java.util.ArrayList;
 
 public class GsoCommonPartCopier {
     public static void copy(GsoControl source, GsoControl target, DocInfoAdder docInfoAdder) {
-        ctrlHeader(source.getHeader(), target.getHeader());
+        // in container == null
+        if (source.getHeader() != null) {
+            ctrlHeader(source.getHeader(), target.getHeader());
+        }
         ctrlData(source, target, docInfoAdder);
         caption(source, target, docInfoAdder);
         if (source.getGsoType() == GsoControlType.Container) {
@@ -45,7 +48,7 @@ public class GsoCommonPartCopier {
         target.setOutterMarginBottom(source.getOutterMarginBottom());
         target.setInstanceId(source.getInstanceId());
         target.setPreventPageDivide(source.isPreventPageDivide());
-        target.setExplanation(source.getExplanation());
+        target.getExplanation().copy(source.getExplanation());
     }
 
     private static void ctrlData(GsoControl source, GsoControl target, DocInfoAdder docInfoAdder) {
@@ -160,7 +163,7 @@ public class GsoCommonPartCopier {
         target.getColor().setValue(source.getColor().getValue());
         target.setOffsetX(source.getOffsetX());
         target.setOffsetY(source.getOffsetY());
-        target.setTransparnet(source.getTransparnet());
+        target.setTransparent(source.getTransparent());
     }
 
     private static void shapeComponentGroup(ShapeComponentContainer source, ShapeComponentContainer target) {

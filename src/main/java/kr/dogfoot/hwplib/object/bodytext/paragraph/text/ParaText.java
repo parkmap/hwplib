@@ -34,6 +34,13 @@ public class ParaText {
         return nc;
     }
 
+    public HWPCharNormal insertNewNormalChar(int position) {
+        HWPCharNormal nc = new HWPCharNormal();
+        charList.add(position, nc);
+        return nc;
+    }
+
+
     /**
      * 새로운 [문자 컨트롤 Character]를 생성하고 리스트에 추가한다.
      *
@@ -168,6 +175,26 @@ public class ParaText {
     }
 
     /**
+     * 문자열을 추가한다.
+     *
+     * @param str 추가할 문자열
+     * @throws UnsupportedEncodingException
+     */
+    public int insertString(int position, String str) throws UnsupportedEncodingException {
+        int oldCharSize = getCharSize();
+
+        int len = str.length();
+        for (int index = 0; index < len; index++) {
+            HWPCharNormal ch = insertNewNormalChar(position + index);
+            ch.setCode((short) str.codePointAt(index));
+        }
+        processEndOfParagraph();
+
+        return getCharSize() - oldCharSize;
+    }
+
+
+    /**
      * 구역 정의 컨트롤를 추가하기 위한  확장 컨트롤 문자를 추가한다.
      */
     public void addExtendCharForSectionDefine() {
@@ -197,6 +224,7 @@ public class ParaText {
                 break;
             }
         }
+
         HWPCharNormal ch2 = addNewNormalChar();
         ch2.setCode((short) 0x0d);
     }
@@ -302,11 +330,61 @@ public class ParaText {
         processEndOfParagraph();
     }
 
+    /**
+     * 머리말을 위한 확장 컨트롤 문자를 추가한다.
+     */
+    public void addExtendCharForHeader() {
+        HWPCharControlExtend chExtend = addNewExtendControlChar();
+        chExtend.setCode((short) 0x0010);
+        byte[] addition = new byte[12];
+        addition[3] = 'h';
+        addition[2] = 'e';
+        addition[1] = 'a';
+        addition[0] = 'd';
+        try {
+            chExtend.setAddition(addition);
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        processEndOfParagraph();
+    }
+
+    /**
+     * 머리말을 위한 확장 컨트롤 문자를 추가한다.
+     */
+    public void addExtendCharForFooter() {
+        HWPCharControlExtend chExtend = addNewExtendControlChar();
+        chExtend.setCode((short) 0x0010);
+        byte[] addition = new byte[12];
+        addition[3] = 'f';
+        addition[2] = 'o';
+        addition[1] = 'o';
+        addition[0] = 't';
+        try {
+            chExtend.setAddition(addition);
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        processEndOfParagraph();
+    }
+
+
     public ParaText clone() {
         ParaText cloned = new ParaText();
         for (HWPChar hwpChar : charList) {
             cloned.charList.add(hwpChar.clone());
         }
         return cloned;
+    }
+
+    public int getCharSize() {
+        int length = 0;
+        for (HWPChar hwpChar : charList) {
+            length += hwpChar.getCharSize();
+        }
+        return length;
     }
 }

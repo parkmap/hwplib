@@ -8,6 +8,8 @@ import kr.dogfoot.hwplib.object.bodytext.paragraph.text.HWPChar;
 import kr.dogfoot.hwplib.object.bodytext.paragraph.text.ParaText;
 import kr.dogfoot.hwplib.writer.autosetter.control.ForControl;
 
+import java.io.UnsupportedEncodingException;
+
 /**
  * 문단 객체를 쓰기 전에 자동 설정하기 위한 객체
  *
@@ -67,21 +69,9 @@ public class ForParagraph {
         if (t != null) {
             int charCount = 0;
             for (HWPChar ch : t.getCharList()) {
-                switch (ch.getType()) {
-                    case Normal:
-                        charCount += 1;
-                        break;
-                    case ControlChar:
-                        charCount += 1;
-                        break;
-                    case ControlExtend:
-                        charCount += 8;
-                        break;
-                    case ControlInline:
-                        charCount += 8;
-                        break;
-                }
+                charCount += ch.getCharSize();
             }
+
             h.setCharacterCount(charCount);
         } else {
             h.setCharacterCount(1);

@@ -21,6 +21,7 @@ public class ForTable {
      */
     public static void read(Table table, StreamReader sr) throws IOException {
         table.getProperty().setValue(sr.readUInt4());
+
         table.setRowCount(sr.readUInt2());
         table.setColumnCount(sr.readUInt2());
         table.setCellSpacing(sr.readUInt2());
@@ -28,11 +29,12 @@ public class ForTable {
         table.setRightInnerMargin(sr.readUInt2());
         table.setTopInnerMargin(sr.readUInt2());
         table.setBottomInnerMargin(sr.readUInt2());
+
         for (int index = 0; index < table.getRowCount(); index++) {
             table.addCellCountOfRow(sr.readUInt2());
         }
-        table.setBorderFillId(sr.readUInt2());
 
+        table.setBorderFillId(sr.readUInt2());
         if (sr.getFileVersion().isOver(5, 0, 1, 0)) {
             zoneInfo(table, sr);
         }

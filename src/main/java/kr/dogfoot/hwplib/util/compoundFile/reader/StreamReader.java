@@ -162,6 +162,9 @@ public abstract class StreamReader {
         header.setTagID((short) BitFlag.get(value, 0, 9));
         header.setLevel((short) BitFlag.get(value, 10, 19));
         header.setSize((short) BitFlag.get(value, 20, 31));
+        if (header.getSize() == 4095) {
+            header.setSize(readUInt4());
+        }
         readAfterHeader = 0;
         return header;
     }
@@ -184,16 +187,36 @@ public abstract class StreamReader {
         }
     }
 
+    public byte[] readHWPString() throws IOException {
+        int len = readUInt2();
+        if (len > 0) {
+            byte[] arr = new byte[len * 2];
+            readBytes(arr);
+            return arr;
+        } else {
+            return null;
+        }
+    }
+
+
+
     /**
      * 한 글자를 읽어서 반환한다.
      *
      * @return 한 글자
      * @throws IOException
      */
+    /*
     public String readWChar() throws IOException {
         byte[] arr = new byte[2];
         readBytes(arr);
         return new String(arr, 0, 2, StandardCharsets.UTF_16LE);
+    }
+     */
+    public byte[] readWChar() throws IOException {
+        byte[] arr = new byte[2];
+        readBytes(arr);
+        return arr;
     }
 
     /**
